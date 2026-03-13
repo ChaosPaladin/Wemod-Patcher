@@ -18,9 +18,9 @@ jobs:
 
       - name: Build proxy DLL
         run: |
-          cd tools/asar-fuses-bypass
-          cmake -B cmake-build-release -DCMAKE_BUILD_TYPE=Release
-          cmake --build cmake-build-release --config Release
+            cd tools/asar-fuses-bypass
+            cmake -B cmake-build-release -T ClangCL
+            cmake --build cmake-build-release --config Release
 
       - name: Build solution
         run: msbuild Wemod-Patcher.sln /p:Configuration=Release
