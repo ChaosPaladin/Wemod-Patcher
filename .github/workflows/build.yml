@@ -10,17 +10,25 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
       - uses: NuGet/setup-nuget@v2
       - uses: microsoft/setup-msbuild@v2
       - uses: jwlawson/actions-setup-cmake@v2
+
       - name: Restore packages
         run: nuget restore Wemod-Patcher.sln
 
+      - name: Install MinGW
+        run: choco install mingw -y
+
       - name: Build proxy DLL
         run: |
-            cd tools/asar-fuses-bypass
-            cmake -B cmake-build-release -T ClangCL
-            cmake --build cmake-build-release --config Release
+          cd tools/asar-fuses-bypass
+          cmake -B build -G "MinGW Makefiles"
+          cmake --build build
+
+      - name: Copy version.dll
+        run: copy tools\asar-fuses-bypass\build\version.dll tools\asar-fuses-bypass\cmake-build-release\version.dll
 
       - name: Build solution
         run: msbuild Wemod-Patcher.sln /p:Configuration=Release
