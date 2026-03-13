@@ -1,0 +1,35 @@
+name: Build
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore Wemod-Patcher.sln
+
+      - name: Build solution
+        run: dotnet build Wemod-Patcher.sln --configuration Release --no-restore
+
+      - name: Publish
+        run: dotnet publish Wemod-Patcher.sln -c Release -o publish
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: wemod-patcher-build
+          path: publish
