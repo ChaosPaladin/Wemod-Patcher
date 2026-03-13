@@ -28,7 +28,9 @@ jobs:
           cmake --build build
 
       - name: Copy version.dll
-        run: copy tools\asar-fuses-bypass\build\version.dll tools\asar-fuses-bypass\cmake-build-release\version.dll
+        run: |
+          New-Item -ItemType Directory -Force tools/asar-fuses-bypass/cmake-build-release
+          Copy-Item tools/asar-fuses-bypass/build/version.dll tools/asar-fuses-bypass/cmake-build-release/version.dll
 
       - name: Build solution
         run: msbuild Wemod-Patcher.sln /p:Configuration=Release
