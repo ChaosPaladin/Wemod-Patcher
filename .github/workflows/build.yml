@@ -2,34 +2,30 @@ name: Build
 
 on:
   push:
-    branches: [ main, master ]
   pull_request:
-    branches: [ main, master ]
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: NuGet/setup-nuget@v2
+      - uses: microsoft/setup-msbuild@v2
+      - uses: jwlawson/actions-setup-cmake@v2
+      - name: Restore packages
+        run: nuget restore Wemod-Patcher.sln
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
-
-      - name: Restore dependencies
-        run: dotnet restore Wemod-Patcher.sln
+      - name: Build proxy DLL
+        run: |
+          cd tools/asar-fuses-bypass
+          cmake -B cmake-build-release -DCMAKE_BUILD_TYPE=Release
+          cmake --build cmake-build-release --config Release
 
       - name: Build solution
-        run: dotnet build Wemod-Patcher.sln --configuration Release --no-restore
+        run: msbuild Wemod-Patcher.sln /p:Configuration=Release
 
-      - name: Publish
-        run: dotnet publish Wemod-Patcher.sln -c Release -o publish
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: wemod-patcher-build
-          path: publish
+          name: WemodPatcher
+          path: WeModPatcher/bin/Release/
